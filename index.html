@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>গরুর মাংস সমিতি</title>
+  <style>
+  /* Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Arial', sans-serif;
+}
+
+body {
+  background-color: #f4f4f4;
+  color: #333;
+  line-height: 1.6;
+}
+
+.container {
+  width: 80%;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1, h2, h3 {
+  color: #000000;
+font-size: 1.2rem;
+}
+
+.muted {
+  color: #7f8c8d;
+}
+
+.site-header {
+  background-color: #ffffff;
+  color: white;
+  padding: 20px 0;
+  text-align: center;
+}
+
+.site-header h1 {
+  font-size: 1.2rem;
+}
+
+.card {
+  background-color: white;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.card h2 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.card .big {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #27ae60;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.controls input, .controls select, .controls button {
+  padding: 10px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.controls button {
+  background-color: #3498db;
+  cursor: pointer;
+}
+
+.controls button a {
+  color: white;
+  text-decoration: none; /* আন্ডারলাইন সরাতে চাইলে */
+  display: inline-block; /* ক্লিক ঠিকমতো কাজ করে */
+  width: 100%;
+  height: 100%;
+}
+
+
+.controls button:hover {
+  background-color: #2980b9;
+}
+
+.controls label {
+  display: flex;
+  align-items: center;
+}
+
+.controls input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+.table-wrap {
+  background-color: #ecf0f1;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.site-footer {
+  background-color: #2c3e50;
+  color: white;
+  text-align: center;
+  padding: 20px 0;
+}
+
+.site-footer small {
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 90%;
+  }
+
+  .controls {
+    flex-direction: column;
+  }
+
+  .controls input, .controls select, .controls button {
+    margin-bottom: 10px;
+  }
+}
+
+/* Table Section Styling */
+.table-wrap {
+margin-top: 10px;
+padding: 10px;
+border: 2px solid #2980b9;
+border-radius: 8px;
+background-color: #ecf0f1;
+}
+
+#members {
+font-size: 14px;
+color: #34495e;
+text-align: left;
+}
+
+/* Hover effects for arrows and items */
+.arrow {
+cursor: pointer;
+margin-right: 15px;
+transition: transform 0.3s;
+}
+
+.arrow.open {
+transform: rotate(180deg);
+}
+
+/* Styling for member rows and details */
+.member-row {
+display: flex;
+justify-content: space-between;
+padding: 8px;
+background-color: #ffffff;
+margin-bottom: 10px;
+border-radius: 8px;
+border: 1px solid #ddd;
+}
+
+.member-row:hover {
+background-color: #f0f8ff;
+}
+
+.member-name {
+font-weight: bold;
+}
+
+.member-amt {
+color: #27ae60;
+}
+
+/* Member detail section */
+.member-detail {
+padding: 10px;
+background-color: #f8f9fa;
+border: 1px solid #ddd;
+border-radius: 8px;
+margin-top: 10px;
+display: none;
+}
+
+.member-left {
+display: flex;
+align-items: center;
+}
+
+.member-left .arrow {
+margin-right: 10px;
+}
+
+</style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1>হাম্বা! হাম্বা! </h1>
+      <p class="muted">গোপালপুর শান্তি পাড়া আদর্শ গরুর মাংস সমিতি!</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <div class="row">
+        <div>
+<center>
+          <h2>মোট উত্তলোন:</h2>
+          <div id="total" class="big">লোড হচ্ছে...</div>
+</center>
+        </div>
+        <div class="controls">
+          <input id="q" placeholder="সদস্য খুঁজুন..." />
+          <select id="sort">
+            <option value="-total">টাকা (বড় → ছোট)</option>
+            <option value="total_asc">টাকা (ছোট → বড়)</option>
+            <option value="name">নাম (A→Z)</option>
+          </select>
+
+<button><a href="https://wa.me/+8801968355627" id="exportBtn">
+    WhatsApp Pay Now
+</a> </button>
+
+          <label><input id="autoref" type="checkbox"> Auto refresh (30s)</label>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3> সদস্যগণ: <small class="muted"></small></h3>
+      <div id="members" class="table-wrap">লোড হচ্ছে...</div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <small>Developer By Nasim Parvez </small>
+      <small>+8801968355627 </small>
+    </div>
+  </footer>
+
+  <script>
+// Google Sheets থেকে ডেটা পড়ার জন্য URL
+const SHEET_ID = "18UmKrymf-Aj18XnyoKm5KSQLSB_1jI6mQgutTh4sl20";
+const PAYMENTS_URL = `https://opensheet.elk.sh/${SHEET_ID}/Payments`;
+const MEMBERS_URL = `https://opensheet.elk.sh/${SHEET_ID}/Members`;
+
+// DOM elements reference
+const el = id => document.getElementById(id);
+const totalEl = el("total");
+const membersEl = el("members");
+const qEl = el("q");
+const sortEl = el("sort");
+const autoref = el("autoref");
+
+let payments = [], members = [];
+
+// Normalize row data (trim and lowercase keys)
+function normalizeRow(row) {
+  const out = {};
+  for (const k of Object.keys(row)) {
+    const nk = String(k).trim().toLowerCase();
+    out[nk] = row[k];
+  }
+  return out;
+}
+
+// Extract amount from row based on known key patterns
+function extractAmountFromRow(rowNorm) {
+  const candidates = ["amount", "amt", "value", "পরিমাণ", "টাকা", "amount_bdt"];
+  for (const c of candidates) {
+    if (rowNorm.hasOwnProperty(c) && rowNorm[c] !== "") return rowNorm[c];
+  }
+  for (const k of Object.keys(rowNorm)) {
+    const v = String(rowNorm[k]||"").replace(/,/g,"").trim();
+    if (v !== "" && !isNaN(Number(v))) return rowNorm[k];
+  }
+  return null;
+}
+
+// Parse amount and ensure it is a valid number
+function parseAmountRaw(val) {
+  if (val === null || val === undefined || val === "") return 0;
+  let s = String(val).trim();
+  s = s.replace(/[,\u00A0]/g, "");
+  s = s.replace(/[^\d.\-]/g, "");
+  const n = Number(s);
+  return isNaN(n) ? 0 : n;
+}
+
+// Format amount as money (with "টাকা")
+function formatMoney(x) { 
+  const v = Number(x || 0); 
+  if (isNaN(v)) return x; 
+  return v.toLocaleString() + " ৳"; 
+}
+
+// Parse date to a readable format
+function parseDate(s) { 
+  if (!s) return ""; 
+  const d = new Date(s); 
+  if (isNaN(d)) return s; 
+  return d.toLocaleDateString(); 
+}
+
+// Compute total payments per member and the overall total
+function computeTotals() {
+  let overall = 0;
+  const map = {};
+  payments.forEach(p => {
+    const name = (p.member || p.Member || "").toString().trim();
+    const key = name.toLowerCase();
+    const amt = Number(p._amountNum || 0);
+    overall += amt;
+    if (!map[key]) map[key] = { name, phone: "", address: "", total: 0, payments: [] };
+    map[key].total += amt;
+    map[key].payments.push(p);
+  });
+  // Incorporate members sheet data (phone/address)
+  members.forEach(m => {
+    const name = (m.name || m.Name || "").toString().trim();
+    const key = name.toLowerCase();
+    if (!map[key]) map[key] = { name, phone: m.phone || m.Phone || "", address: m.address || m.Address || "", total: 0, payments: [] };
+    else {
+      map[key].phone = map[key].phone || m.phone || m.Phone || "";
+      map[key].address = map[key].address || m.address || m.Address || "";
+    }
+  });
+  return { overall, map };
+}
+
+// Render total amount
+function renderTotal(overall) {
+  totalEl.textContent = formatMoney(overall);
+}
+
+// Render members' data (with search, sort, and toggle details)
+function renderMembers() {
+  const { overall, map } = computeTotals();
+  renderTotal(overall);
+
+  // Create list from map
+  const list = Object.keys(map).map(k => {
+    return { key: k, ...map[k] };
+  });
+
+  // Apply search
+  const q = (qEl.value || "").trim().toLowerCase();
+  const filteredList = list.filter(item => {
+    if (!q) return true;
+    return (item.name || "").toLowerCase().includes(q) || (item.phone || "").toLowerCase().includes(q) || (item.address || "").toLowerCase().includes(q);
+  });
+
+  // Apply sorting
+  const sortVal = sortEl.value;
+  if (sortVal === "-total") filteredList.sort((a, b) => b.total - a.total);
+  else if (sortVal === "total_asc") filteredList.sort((a, b) => a.total - b.total);
+  else if (sortVal === "name") filteredList.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+
+  // Render all members (with or without show more functionality)
+  if (filteredList.length === 0) {
+    membersEl.innerHTML = "<p class='muted'>কোনো সদস্য পাওয়া যায়নি</p>";
+    return;
+  }
+
+  let html = "";
+  filteredList.forEach((m, idx) => {
+    const id = `member-${idx}`;
+    html += `<div class="member-row" id="${id}" data-idx="${idx}">
+      <div class="member-left">
+        <span class="arrow" aria-hidden="true"></span>
+        <div>
+          <div class="member-name">${m.name || "(নাম নেই)"}</div>
+          <div class="member-sub">${m.phone || ""} ${m.address ? "· " + m.address : ""}</div>
+        </div>
+      </div>
+      <div class="member-amt">${formatMoney(m.total || 0)}</div>
+    </div>
+    <div class="member-detail" id="${id}-detail" style="display:none;">
+      <div><strong>নাম:</strong> ${m.name || ""}</div>
+      <div><strong>মোবাইল:</strong> ${m.phone || ""}</div>
+      <div><strong>ঠিকানা:</strong> ${m.address || ""}</div>
+      <div class="small-note"><strong>মোট জমা:</strong> ${formatMoney(m.total || 0)}</div>
+    </div>`;
+  });
+
+  membersEl.innerHTML = html;
+
+  // Attach toggle handlers for expanding member details
+  const rows = membersEl.querySelectorAll(".member-row");
+  rows.forEach(r => {
+    r.addEventListener("click", () => {
+      const detail = document.getElementById(r.id + "-detail");
+      const arrow = r.querySelector(".arrow");
+      if (!detail) return;
+      if (detail.style.display === "none") {
+        detail.style.display = "block";
+        arrow.classList.add("open");
+      } else {
+        detail.style.display = "none";
+        arrow.classList.remove("open");
+      }
+    });
+  });
+}
+
+// Load data from Google Sheets (Payments and Members)
+async function loadAll() {
+  try {
+    totalEl.textContent = "লোড হচ্ছে...";
+    membersEl.textContent = "লোড হচ্ছে...";
+    const [pRes, mRes] = await Promise.all([fetch(PAYMENTS_URL), fetch(MEMBERS_URL)]);
+    if (!pRes.ok || !mRes.ok) throw new Error("Sheet fetch failed: " + pRes.status + " / " + mRes.status);
+    const pJson = await pRes.json();
+    const mJson = await mRes.json();
+
+    payments = pJson.map(raw => {
+      const norm = normalizeRow(raw);
+      const rawAmt = extractAmountFromRow(norm);
+      const amtNum = parseAmountRaw(rawAmt);
+      const out = Object.assign({}, raw, norm);
+      out._amountRaw = rawAmt;
+      out._amountNum = amtNum;
+      return out;
+    });
+
+    members = mJson.map(r => {
+      return {
+        name: (r.name || r.Name || "").toString().trim(),
+        phone: (r.phone || r.Phone || r.telephone || "").toString().trim(),
+        address: (r.address || r.Address || "").toString().trim()
+      };
+    });
+
+    // Render members + total
+    renderMembers();
+    console.log("Loaded payments:", payments.length, "members:", members.length);
+  } catch (err) {
+    console.error(err);
+    totalEl.textContent = "ডেটা লোড করতে সমস্যা হয়েছে";
+    membersEl.textContent = "ডেটা লোড করতে সমস্যা হয়েছে";
+  }
+}
+
+// Events for search, sorting, and auto-refresh
+qEl.addEventListener("input", () => { renderMembers(); });
+sortEl.addEventListener("change", () => { renderMembers(); });
+autoref.addEventListener("change", () => { 
+  if (autoref.checked) window._refInterval = setInterval(loadAll, 30000); 
+  else clearInterval(window._refInterval); 
+});
+
+// Initialize data load
+loadAll();
+
+</script>
+</body>
+</html>

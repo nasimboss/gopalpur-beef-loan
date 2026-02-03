@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>গরুর মাংস সমিতি</title>
   <style>
+    .notice-board {
+  background: #ffffff;
+  border-bottom: 2px solid #fdcb6e;
+border-top: 2px solid #fdcb6e;
+  padding: 10px 0;
+}
+
+.notice-board marquee {
+  font-weight:bold ;
+  color: #27ae60;
+  font-size: 0.9rem;
+}
+
   /* Global Reset */
 * {
   margin: 0;
@@ -211,6 +224,12 @@ margin-right: 10px;
       <h1>হাম্বা! হাম্বা! </h1>
       <p class="muted">গোপালপুর শান্তি পাড়া আদর্শ গরুর মাংস সমিতি!</p>
     </div>
+    
+    <section class="notice-board">
+  <div class="container">
+    <marquee id="noticeText">নোটিশ লোড হচ্ছে...</marquee>
+  </div>
+</section>
   </header>
 
   <main class="container">
@@ -257,6 +276,7 @@ margin-right: 10px;
 const SHEET_ID = "18UmKrymf-Aj18XnyoKm5KSQLSB_1jI6mQgutTh4sl20";
 const PAYMENTS_URL = `https://opensheet.elk.sh/${SHEET_ID}/Payments`;
 const MEMBERS_URL = `https://opensheet.elk.sh/${SHEET_ID}/Members`;
+const NOTICE_URL = `https://opensheet.elk.sh/${SHEET_ID}/Notice`;
 
 // DOM elements reference
 const el = id => document.getElementById(id);
@@ -463,8 +483,30 @@ autoref.addEventListener("change", () => {
   else clearInterval(window._refInterval); 
 });
 
+async function loadNotice() {
+  try {
+    const res = await fetch(NOTICE_URL);
+    if (!res.ok) throw new Error("Notice load failed");
+    const data = await res.json();
+
+    const activeNotices = data
+      .filter(n => String(n.active || "").toUpperCase() === "YES")
+      .map(n => n.message)
+      .filter(Boolean);
+
+    document.getElementById("noticeText").textContent =
+      activeNotices.length
+        ? activeNotices.join(" | ")
+        : "এই মুহূর্তে কোনো নোটিশ নেই";
+  } catch (e) {
+    document.getElementById("noticeText").textContent =
+      "নোটিশ লোড করা যাচ্ছে না";
+  }
+}
+
 // Initialize data load
 loadAll();
+loadNotice();
 
 </script>
 </body>

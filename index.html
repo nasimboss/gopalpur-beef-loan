@@ -5,6 +5,78 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>গরুর মাংস সমিতি</title>
   <style>
+  /* === GLOBAL FIX === */
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* === FULL SCREEN OVERLAY === */
+.full-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+
+  background: #f4f4f4;
+  z-index: 999999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* === CENTER BOX === */
+.box {
+  background: #ffffff;
+  width: 90%;
+  max-width: 360px;
+
+  padding: 28px 24px;
+  border-radius: 14px;
+
+  text-align: center;
+
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+}
+
+/* === INPUT === */
+.box input {
+  width: 100%;
+  padding: 12px;
+  margin: 14px 0;
+  font-size: 15px;
+
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+}
+
+/* === BUTTON === */
+.box button {
+  width: 100%;
+  padding: 12px;
+
+  background: #27ae60;
+  color: #fff;
+  font-size: 15px;
+  font-weight: bold;
+
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* === ERROR TEXT === */
+#passError {
+  margin-top: 10px;
+  color: red;
+  font-size: 14px;
+}
+
     .notice-board {
   background: #ffffff;
   border-bottom: 2px solid #fdcb6e;
@@ -219,6 +291,31 @@ margin-right: 10px;
 </style>
 </head>
 <body>
+<!-- AUTH SCREEN -->
+<div id="authScreen" class="full-screen">
+  <div class="box">
+    <h3>পাসওয়ার্ড দিন</h3>
+    <input id="passInput" type="password" placeholder="Password">
+    <button onclick="submitPassword()">প্রবেশ করুন</button>
+    <p id="passError"></p>
+  </div>
+</div>
+
+<!-- ADMIN CONTACT -->
+<div id="adminScreen" class="full-screen">
+  <div class="box">
+    <h3>পাসওয়ার্ড প্রয়োজন</h3>
+    <p>আমার সাথে যোগাযোগ করুন</p>
+
+    <a href="tel:+8801968355627">📞 Call</a>
+    <a href="https://wa.me/8801968355627">💬 WhatsApp</a>
+    <a href="https://www.facebook.com/nasim.parvez360">ⓕ Facebook</a>
+  </div>
+</div>
+
+<!-- MAIN SITE -->
+<div id="mainSite">
+
   <header class="site-header">
     <div class="container">
       <h1>হাম্বা! হাম্বা! </h1>
@@ -277,6 +374,7 @@ const SHEET_ID = "18UmKrymf-Aj18XnyoKm5KSQLSB_1jI6mQgutTh4sl20";
 const PAYMENTS_URL = `https://opensheet.elk.sh/${SHEET_ID}/Payments`;
 const MEMBERS_URL = `https://opensheet.elk.sh/${SHEET_ID}/Members`;
 const NOTICE_URL = `https://opensheet.elk.sh/${SHEET_ID}/Notice`;
+const AUTH_URL = `https://opensheet.elk.sh/${SHEET_ID}/Auth`;
 
 // DOM elements reference
 const el = id => document.getElementById(id);
@@ -504,10 +602,73 @@ async function loadNotice() {
   }
 }
 
+
+const authScreen = document.getElementById("authScreen");
+const adminScreen = document.getElementById("adminScreen");
+const mainSite = document.getElementById("mainSite");
+const passError = document.getElementById("passError");
+
+let sheetPassword = null;
+
+function hideAll(){
+  authScreen.style.display="none";
+  adminScreen.style.display="none";
+  mainSite.style.display="none";
+}
+
+async function initAuth(){
+  hideAll();
+
+  if(localStorage.getItem("site_auth_ok")==="YES"){
+    mainSite.style.display="block";
+    return;
+  }
+
+  try{
+    const res = await fetch(AUTH_URL);
+    const data = await res.json();
+    const row = data.find(r => String(r.active).toUpperCase()==="YES");
+
+    if(!row){
+      adminScreen.style.display="flex";
+      return;
+    }
+
+    sheetPassword = String(row.password).trim();
+    authScreen.style.display="flex";
+
+  }catch(e){
+    adminScreen.style.display="flex";
+  }
+}
+
+function submitPassword(){
+  if(sheetPassword === null) return;
+
+  const input = document.getElementById("passInput").value.trim();
+
+  if(input === sheetPassword){
+    localStorage.setItem("site_auth_ok","YES");
+    hideAll();
+    mainSite.style.display="block";
+  }else{
+    passError.textContent = "ভুল পাসওয়ার্ড";
+    setTimeout(()=>{
+      hideAll();
+      adminScreen.style.display="flex";
+    },1000);
+  }
+}
+
+
+
 // Initialize data load
 loadAll();
 loadNotice();
+initAuth();
+
 
 </script>
+</div>
 </body>
 </html>

@@ -310,6 +310,19 @@ margin-right: 10px;
     <a href="tel:+8801968355627">📞 Call</a>
     <a href="https://wa.me/8801968355627">💬 WhatsApp</a>
     <a href="https://www.facebook.com/nasim.parvez360">ⓕ Facebook</a>
+    <button onclick="backToLogin()" style="
+  margin-top:15px;
+  padding:10px;
+  width:100%;
+  border:none;
+  border-radius:8px;
+  background:#3498db;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+">
+Back to Login
+</button>
   </div>
 </div>
 
@@ -602,63 +615,84 @@ async function loadNotice() {
   }
 }
 
-
 const authScreen = document.getElementById("authScreen");
 const adminScreen = document.getElementById("adminScreen");
-const mainSite = document.getElementById("mainSite");
-const passError = document.getElementById("passError");
+const mainSite   = document.getElementById("mainSite");
+const passError  = document.getElementById("passError");
 
 let sheetPassword = null;
 
 function hideAll(){
-  authScreen.style.display="none";
-  adminScreen.style.display="none";
-  mainSite.style.display="none";
+  authScreen.style.display = "none";
+  adminScreen.style.display = "none";
+  mainSite.style.display   = "none";
+}
+
+/* Active checker */
+function isActive(val){
+  if(!val) return false;
+  const v = String(val).trim().toLowerCase();
+  return v === "yes" || v === "true" || v === "1";
 }
 
 async function initAuth(){
   hideAll();
 
-  if(localStorage.getItem("site_auth_ok")==="YES"){
-    mainSite.style.display="block";
-    return;
-  }
-
   try{
     const res = await fetch(AUTH_URL);
     const data = await res.json();
-    const row = data.find(r => String(r.active).toUpperCase()==="YES");
 
+    /* Active row খুঁজে বের করি */
+    const row = data.find(r => isActive(r.active));
+
+    /* Active row না থাকলে → direct site */
     if(!row){
-      adminScreen.style.display="flex";
+      mainSite.style.display = "block";
       return;
     }
 
-    sheetPassword = String(row.password).trim();
-    authScreen.style.display="flex";
+    const pwd = String(row.password || "").trim();
 
-  }catch(e){
-    adminScreen.style.display="flex";
+    /* Password ফাঁকা হলে → direct site */
+    if(pwd === ""){
+      mainSite.style.display = "block";
+      return;
+    }
+
+    /* Password আছে → login চাই */
+    sheetPassword = pwd;
+    authScreen.style.display = "flex";
+
+  }catch(err){
+    adminScreen.style.display = "flex";
   }
 }
 
 function submitPassword(){
-  if(sheetPassword === null) return;
-
   const input = document.getElementById("passInput").value.trim();
 
+  if(!sheetPassword) return;
+
   if(input === sheetPassword){
-    localStorage.setItem("site_auth_ok","YES");
     hideAll();
-    mainSite.style.display="block";
+    mainSite.style.display = "block";
   }else{
     passError.textContent = "ভুল পাসওয়ার্ড";
     setTimeout(()=>{
       hideAll();
-      adminScreen.style.display="flex";
-    },1000);
+      adminScreen.style.display = "flex";
+    }, 800);
   }
 }
+
+function backToLogin(){
+  hideAll();
+  passError.textContent = "";
+  document.getElementById("passInput").value = "";
+  authScreen.style.display = "flex";
+}
+
+
 
 
 

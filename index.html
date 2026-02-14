@@ -13,6 +13,29 @@ html, body {
   padding: 0;
 }
 
+/* Notice Board */
+    .notice-board {
+      width: 100%;
+      background: #ffffff;
+      border-top: 2px solid #fdcb6e;
+      border-bottom: 2px solid #fdcb6e;
+      padding: 12px 0;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .notice-text {
+      font-weight: bold;
+      color: red;
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    .notice-text span {
+      display: block;
+      padding: 3px 0;
+    }
+
 /* === FULL SCREEN OVERLAY === */
 .full-screen {
   position: fixed;
@@ -77,18 +100,7 @@ html, body {
   font-size: 14px;
 }
 
-    .notice-board {
-  background: #ffffff;
-  border-bottom: 2px solid #fdcb6e;
-border-top: 2px solid #fdcb6e;
-  padding: 10px 0;
-}
-
-.notice-board marquee {
-  font-weight:bold ;
-  color: #27ae60;
-  font-size: 0.9rem;
-}
+    
 
   /* Global Reset */
 * {
@@ -331,15 +343,18 @@ Back to Login
 
   <header class="site-header">
     <div class="container">
-      <h1>হাম্বা! হাম্বা! </h1>
+      <h1>ঈদ মোবারক! ঈদ মোবারক!</h1>
       <p class="muted">গোপালপুর শান্তি পাড়া আদর্শ গরুর মাংস সমিতি!</p>
     </div>
     
-    <section class="notice-board">
-  <div class="container">
-    <marquee id="noticeText">নোটিশ লোড হচ্ছে...</marquee>
-  </div>
-</section>
+      <!-- Notice Section -->
+  <section class="notice-board">
+    <div class="container">
+      <p id="noticeText" class="notice-text">
+        নোটিশ লোড হচ্ছে...
+      </p>
+    </div>
+  </section>
   </header>
 
   <main class="container">
@@ -503,7 +518,7 @@ function renderMembers() {
 
   // Render all members (with or without show more functionality)
   if (filteredList.length === 0) {
-    membersEl.innerHTML = "<p class='muted'>কোনো সদস্য পাওয়া যায়নি</p>";
+    membersEl.inneprHTML = "<p class='muted'>কোনো সদস্য পাওয়া যায়নি</p>";
     return;
   }
 
@@ -595,25 +610,32 @@ autoref.addEventListener("change", () => {
 });
 
 async function loadNotice() {
-  try {
-    const res = await fetch(NOTICE_URL);
-    if (!res.ok) throw new Error("Notice load failed");
-    const data = await res.json();
+      const noticeEl = document.getElementById("noticeText");
 
-    const activeNotices = data
-      .filter(n => String(n.active || "").toUpperCase() === "YES")
-      .map(n => n.message)
-      .filter(Boolean);
+      try {
+        const res = await fetch(NOTICE_URL);
+        if (!res.ok) throw new Error("Failed");
 
-    document.getElementById("noticeText").textContent =
-      activeNotices.length
-        ? activeNotices.join(" | ")
-        : "এই মুহূর্তে কোনো নোটিশ নেই";
-  } catch (e) {
-    document.getElementById("noticeText").textContent =
-      "নোটিশ লোড করা যাচ্ছে না";
-  }
-}
+        const data = await res.json();
+
+        const activeNotices = data
+          .filter(n => String(n.active || "").toUpperCase() === "YES")
+          .map(n => n.message)
+          .filter(Boolean);
+
+        if (activeNotices.length > 0) {
+          noticeEl.innerHTML = activeNotices
+            .map(msg => `<span>• ${msg}</span>`)
+            .join("");
+        } else {
+          noticeEl.textContent = "এই মুহূর্তে কোনো নোটিশ নেই";
+        }
+
+      } catch (err) {
+        noticeEl.textContent = "নোটিশ লোড করা যাচ্ছে না";
+      }
+    }
+
 
 const authScreen = document.getElementById("authScreen");
 const adminScreen = document.getElementById("adminScreen");

@@ -467,7 +467,13 @@ function computeTotals() {
   let overall = 0;
   const map = {};
   payments.forEach(p => {
-    const name = (p.member || p.Member || "").toString().trim();
+    const name = (
+  p.Name ||
+  p.name ||
+  p.Member ||
+  p.member ||
+  ""
+).toString().trim();
     const key = name.toLowerCase();
     const amt = Number(p._amountNum || 0);
     overall += amt;
